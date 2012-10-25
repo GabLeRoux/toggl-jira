@@ -12,7 +12,7 @@
  * php -r "var_dump(urlencode(date('c', strtotime('2012-10-07 00:00:01'))));"
  */
 
-// Get stdin JSON
+// Get JSON from stdin
 $fd = fopen('php://stdin', 'r');
 $in = '';
 while (!feof($fd)) {
@@ -62,13 +62,13 @@ foreach ($days as $day => $tickets) {
 
 // Get CSV string
 ob_start();
-$fp = fopen('php://output', 'w'); // this file actual writes to php output
+$fp = fopen('php://output', 'w');
 foreach ($rows as $row) {
 	fputcsv($fp, $row);
 }
 fclose($fp);
 $out = ob_get_clean();
 
-// Output CSV string to stdout
+// Write string to stdout
 $fd = fopen('php://stdout', 'w');
 fwrite($fd, $out);
