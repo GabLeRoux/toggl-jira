@@ -56,6 +56,10 @@ foreach ($days as $day => $tickets) {
         $hours = $duration / 3600;
         $spent = sprintf('%.2fh', $hours);
 
+        if ($spent === '0.00') {
+            continue;
+        }
+
         $rows[] = array($ticket, $day, $spent);
     }
 }
