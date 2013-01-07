@@ -16,7 +16,7 @@
 $fd = fopen('php://stdin', 'r');
 $in = '';
 while (!feof($fd)) {
-	$in .= fread($fd, 1024);
+    $in .= fread($fd, 1024);
 }
 fclose($fd);
 
@@ -27,44 +27,44 @@ $entries = $in->data;
 // Build array of data
 $days = array();
 foreach ($entries as $entry) {
-	
-	// Description should be in Jira ticket ID format: "MYPROJ-123"
-	if (preg_match('/^([A-Z0-9]+-\d+)$/', $entry->description, $matches) === 0) {
-		continue;
-	}
+    
+    // Description should be in Jira ticket ID format: "MYPROJ-123"
+    if (preg_match('/^([A-Z0-9]+-\d+)$/', $entry->description, $matches) === 0) {
+        continue;
+    }
 
-	// Currently running durations are negative
-	if ($entry->duration <= 0) {
-		continue;
-	}
+    // Currently running durations are negative
+    if ($entry->duration <= 0) {
+        continue;
+    }
 
-	$day = date('j/M/y', strtotime($entry->start)).' 12:01 AM';
-	$ticket = $matches[1];
+    $day = date('j/M/y', strtotime($entry->start)).' 12:01 AM';
+    $ticket = $matches[1];
 
-	if (!isset($days[$day][$ticket])) {
-		$days[$day][$ticket] = 0;
-	}
+    if (!isset($days[$day][$ticket])) {
+        $days[$day][$ticket] = 0;
+    }
 
-	$days[$day][$ticket] += $entry->duration;
+    $days[$day][$ticket] += $entry->duration;
 }
 
 // Aggregate data
 $rows = array();
 foreach ($days as $day => $tickets) {
-	foreach ($tickets as $ticket => $duration) {
+    foreach ($tickets as $ticket => $duration) {
 
-		$hours = $duration / 3600;
-		$spent = sprintf('%.2fh', $hours);
+        $hours = $duration / 3600;
+        $spent = sprintf('%.2fh', $hours);
 
-		$rows[] = array($ticket, $day, $spent);
-	}
+        $rows[] = array($ticket, $day, $spent);
+    }
 }
 
 // Get CSV string
 ob_start();
 $fp = fopen('php://output', 'w');
 foreach ($rows as $row) {
-	fputcsv($fp, $row);
+    fputcsv($fp, $row);
 }
 fclose($fp);
 $out = ob_get_clean();
