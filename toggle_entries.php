@@ -2,15 +2,19 @@
 /**
  * Output CSV-formatted output from Toggl that can be entered into Jira
  *
- * Usage:
- *
- * toggl_user='[INSERTKEY]:api_token'
- * curl -u $toggl_user -X GET "https://www.toggl.com/api/v6/time_entries.json?start_date=2012-10-07T00%3A00%3A01-05%3A00&end_date=2012-10-20T23%3A59%3A59-05%3A00" \
- * | php toggle_entries.php | sort
- *
- * Output a date for the URL:
- * php -r "var_dump(urlencode(date('c', strtotime('2012-10-07 00:00:01'))));"
  */
+
+/*
+Usage:
+
+toggl_user='[INSERTKEY]:api_token'
+curl -u $toggl_user \
+    -X GET "https://www.toggl.com/api/v8/time_entries?user_agent=matt@alxndr.me&workspace_id=15478&start_date=2013-12-27T15%3A42%3A46%2B02%3A00&end_date=2014-01-25T15%3A42%3A46%2B02%3A00" \
+    | php toggle_entries.php > insert_entries.sh
+. insert_entries.sh
+*/
+
+date_default_timezone_set('America/Chicago');
 
 // Get JSON from stdin
 $fd = fopen('php://stdin', 'r');
@@ -21,8 +25,7 @@ while (!feof($fd)) {
 fclose($fd);
 
 // Get time entries from JSON
-$in = json_decode($in);
-$entries = $in->data;
+$entries = json_decode($in);
 
 // Build array of data
 $days = array();
@@ -38,7 +41,7 @@ foreach ($entries as $entry) {
         continue;
     }
 
-    $day = date('j/M/y', strtotime($entry->start)).' 12:01 AM';
+    $day = date('Y-m-d', strtotime($entry->start));
     $ticket = $matches[1];
 
     if (!isset($days[$day][$ticket])) {
@@ -60,19 +63,40 @@ foreach ($days as $day => $tickets) {
             continue;
         }
 
-        $rows[] = array($ticket, $day, $spent);
+        $rows[] = compact('ticket', 'day', 'spent');
     }
 }
 
-// Get CSV string
-ob_start();
-$fp = fopen('php://output', 'w');
-foreach ($rows as $row) {
-    fputcsv($fp, $row);
+// Sort data
+$tickets = array();
+$days = array();
+foreach ($rows as $key => $row) {
+    $tickets[$key]  = $row['ticket'];
+    $days[$key] = $row['day'];
 }
-fclose($fp);
-$out = ob_get_clean();
+array_multisort($tickets, SORT_ASC, $days, SORT_ASC, $rows);
+
+// Script
+ob_start();
+?>#!/bin/bash
+
+<?php foreach ($rows as $row): ?>
+
+<?php
+$entry = new StdClass();
+$entry->started = date('Y-m-d\TH:i:s.000O', strtotime($row['day'].' 12:01 AM'));
+$entry->timeSpent = $row['spent'];
+$entry->author = new StdClass;
+$entry->author->self = 'https://jira.careteamconnect.com/rest/api/2/user?username=alexandma';
+?>
+curl -u AlexandMa:$(cat ~/.jira-pass) -X POST -H "Content-Type: application/json" \
+    --data '<?php echo json_encode($entry); ?>' \
+    https://jira.careteamconnect.com/rest/api/2/issue/<?php echo $row['ticket']; ?>/worklog
+<?php endforeach; ?>
+<?php
+$out .= ob_get_clean();
 
 // Write string to stdout
 $fd = fopen('php://stdout', 'w');
 fwrite($fd, $out);
+?>
