@@ -89,6 +89,8 @@ $entry->timeSpent = $row['spent'];
 $entry->author = new StdClass;
 $entry->author->self = 'https://jira.careteamconnect.com/rest/api/2/user?username=alexandma';
 ?>
+# <?php echo $row['ticket']; ?> <?php echo date('n/j/Y', strtotime($row['day'].' 12:01 AM')); ?> <?php echo $entry->timeSpent; ?>
+
 curl -u AlexandMa:$(cat ~/.jira-pass) -X POST -H "Content-Type: application/json" \
     --data '<?php echo json_encode($entry); ?>' \
     https://jira.careteamconnect.com/rest/api/2/issue/<?php echo $row['ticket']; ?>/worklog
