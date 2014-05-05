@@ -79,7 +79,6 @@ array_multisort($tickets, SORT_ASC, $days, SORT_ASC, $rows);
 // Script
 ob_start();
 ?>#!/bin/bash
-
 <?php foreach ($rows as $row): ?>
 
 <?php
