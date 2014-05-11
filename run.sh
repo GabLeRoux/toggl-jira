@@ -4,6 +4,13 @@ set -e
 
 start_date="$1"
 end_date="$2"
+
+date_regex="[0-9]{4}-[0-9]{2}-[0-9]{2}"
+[[ $start_date =~ $date_regex && $end_date =~ $date_regex ]] || {
+    echo "Usage: ./run.sh 2014-01-01 2014-01-31"
+    exit 1
+}
+
 key=$(head -n 1 key.txt);
 script_name="insert_entries-${start_date}-${end_date}.sh"
 toggl_url='https://www.toggl.com/api/v8/time_entries?user_agent=matt@alxndr.me&workspace_id=15478'
