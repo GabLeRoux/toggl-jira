@@ -24,14 +24,15 @@ code=$(curl -s -u "$key:api_token" -X GET "$toggl_url" | php toggle_entries.php)
 echo "$code" > "$script_name"
 
 # Output code to terminal
-echo = TIME ENTRY UPLOAD SCRIPT ============================
+echo = TIME ENTRY UPLOAD SCRIPT START ============================
 echo "$code"
-echo =======================================================
+echo = TIME ENTRY UPLOAD SCRIPT END ==============================
 
 # Message to user
 echo "Script saved to $script_name"
 
 # Upload to Jira
-echo "Press any key to upload to Jira (or Crtl+C to exit) ..."
+echo "Press any key to submit the time to Jira (or Crtl+C to exit) ..."
 read -n 1
-#. "$script_name"
+echo "Submitting ..."
+. "$script_name"
