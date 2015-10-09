@@ -1,6 +1,8 @@
 
+
+# toggl-jira
+
 Download time entries from Toggl and use them to log time in Jira
-=================================================================
 
 ## Setup
 
