@@ -2,7 +2,7 @@
 Download time entries from Toggl and use them to log time in Jira
 =================================================================
 
-# Setup
+## Setup
 
 1. Run:
 
@@ -14,7 +14,7 @@ Download time entries from Toggl and use them to log time in Jira
     
 1. Change values in config.properties.
 
-# General usage
+## General usage
 
 Run run.sh with a start and end date, like this:
 
