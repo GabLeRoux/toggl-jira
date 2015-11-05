@@ -34,6 +34,7 @@ DATE_REGEX="[0-9]{4}-[0-9]{2}-[0-9]{2}"
 
 DAY=${END_DATE:8:2}
 ((DAY++))
+DAY=`printf %02d $DAY`
 DAY_AFTER_END_DATE="${END_DATE:0:8}${DAY}"
 
 TIME="T00%3A01%3A00-05%3A00" # T00:01:00-05:00 (12:01 AM Eastern)
@@ -54,6 +55,7 @@ code=$(curl -s -u "$KEY:api_token" -X GET "$toggl_url" | php toggl_entries.php)
 echo "$code" > "$script_name"
 
 # Output code to terminal
+echo "Called URL: $toggl_url"
 echo ==== BASH SCRIPT START ============================
 echo "$code"
 echo ==== BASH SCRIPT END ==============================
