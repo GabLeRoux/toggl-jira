@@ -51,20 +51,20 @@ toggl_url+="&end_date=${DAY_AFTER_END_DATE}${TIME}"
 #curl -s -u "$KEY:api_token" -X GET "$toggl_url"
 code=$(curl -s -u "$KEY:api_token" -X GET "$toggl_url" | php toggl_entries.php)
 
-# Save to file
-echo "$code" > "$script_name"
-
 # Output code to terminal
 echo "Called URL: $toggl_url"
 echo ==== BASH SCRIPT START ============================
 echo "$code"
 echo ==== BASH SCRIPT END ==============================
 
-# Message to user
-echo "Script saved to $script_name"
-
-# Upload to Jira
+# Prompt user
 echo "Press any key to submit the time to Jira (or Crtl+C to exit) ..."
 read -n 1
-echo "Submitting ..."
+
+# Save to file
+echo "Script saved to $script_name"
+echo "$code" > "$script_name"
+
+# Submit to Jira
+echo "Submitting to Jira ..."
 . "$script_name"
