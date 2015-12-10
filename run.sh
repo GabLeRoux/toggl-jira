@@ -32,7 +32,7 @@ DATE_REGEX="[0-9]{4}-[0-9]{2}-[0-9]{2}"
     exit 1
 }
 
-DAY=${END_DATE:8:2}
+DAY=$(expr ${END_DATE:8:2} + 0)
 ((DAY++))
 DAY=`printf %02d $DAY`
 DAY_AFTER_END_DATE="${END_DATE:0:8}${DAY}"
