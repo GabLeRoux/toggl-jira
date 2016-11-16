@@ -134,16 +134,17 @@ class TogglCaller {
 
 <?php
 $entry = new StdClass();
+// todo: use real started hour from toggl
 $entry->started = date('Y-m-d\TH:i:s.000O', strtotime($row['day'].' 12:01 AM'));
 $entry->timeSpent = $row['spent'];
 $entry->author = new StdClass;
 $entry->author->self = $url . '/user?username=' . $JIRA_USER;
 ?>
-echo '<?php echo $row['ticket']; ?> <?php echo date('n/j/Y', strtotime($row['day'].' 12:01 AM')); ?> <?php echo $entry->timeSpent; ?>'
-
+echo '<?php echo "{$row['ticket']} {$entry->started} $entry->timeSpent;"; ?>'
 curl -u <?php echo $JIRA_USER ?>:$(cat <?php echo $JIRA_PASSWORD_FILE ?>) -X POST -H "Content-Type: application/json" \
 --data '<?php echo json_encode($entry); ?>' \
 <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog
+echo ""
 echo ""
 <?php endforeach; ?>
 <?php
