@@ -139,11 +139,12 @@ $entry->timeSpent = $row['spent'];
 $entry->author = new StdClass;
 $entry->author->self = $url . '/user?username=' . $JIRA_USER;
 ?>
-# <?php echo $row['ticket']; ?> <?php echo date('n/j/Y', strtotime($row['day'].' 12:01 AM')); ?> <?php echo $entry->timeSpent; ?>
+echo '<?php echo $row['ticket']; ?> <?php echo date('n/j/Y', strtotime($row['day'].' 12:01 AM')); ?> <?php echo $entry->timeSpent; ?>'
 
 curl -u <?php echo $JIRA_USER ?>:$(cat <?php echo $JIRA_PASSWORD_FILE ?>) -X POST -H "Content-Type: application/json" \
 --data '<?php echo json_encode($entry); ?>' \
 <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog
+echo ""
 <?php endforeach; ?>
 <?php
         return ob_get_clean() . "\n";
@@ -167,4 +168,3 @@ try {
 } catch (Exception $e) {
     print $e->getMessage();
 }
-

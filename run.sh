@@ -57,14 +57,16 @@ echo ==== BASH SCRIPT START ============================
 echo "$code"
 echo ==== BASH SCRIPT END ==============================
 
-# Prompt user
-echo "Press any key to submit the time to Jira (or Crtl+C to exit) ..."
-read -n 1
 
 # Save to file
 echo "Script saved to $script_name"
 echo "$code" > "$script_name"
 
+# Prompt user
+echo "Press any key to submit the time to Jira (or Crtl+C to exit) ..."
+read -n 1
+
 # Submit to Jira
-echo "Submitting to Jira ..."
-. "$script_name"
+log_file=${script_name}.log
+echo "Submitting to Jira ... (logging to ${log_file})"
+. "$script_name" | tee ${log_file}

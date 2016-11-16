@@ -12,7 +12,7 @@ Download time entries from Toggl and use them to log time in Jira
         cd toggl-jira
         echo "<TOGGL API KEY>" > ~/.toggl-key
         echo "<JIRA PASSWORD>" > ~/.jira-pass
-        mv config.properties.dist config.properties
+        cp config.properties.dist config.properties
     
 1. Change values in config.properties.
 
