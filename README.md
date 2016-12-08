@@ -67,4 +67,7 @@ You will then see something that looks like this:
     pi/2/issue/29711/worklog/14240","author":{"self":"https://myjira.atlassian.net/rest/api/2/user?username=malexan.....
     
     [and on and on...]
-    
+
+# License
+
+MIT © [Matt Alexander](https://github.com/mattalexx)
