@@ -6,7 +6,7 @@
 class TogglCaller {
 
     public static function getPropertyValues() {
-        $configurationFile = 'config.properties';
+        $configurationFile = getenv('PROP_FILE');
         $result = array();
         $lines = file($configurationFile);
 

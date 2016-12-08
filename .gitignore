@@ -1,6 +1,7 @@
-/insert_entries.sh
 /key.txt
 .DS_Store
-/insert_entries-*
 /config.properties
 /.idea
+/config.*.properties
+/insert_entries/*
+!/insert_entries/.gitkeep
