@@ -66,3 +66,7 @@ keeping log files with parameters and current time whic is quite handy if someth
 * **Actually set the right hour in jira, that would be very useful.**
 * Maybe rewrite most of the things here into something a bit more cleaner? Thinking of typescript, making a node module or something like that.
 * Add client name to generated shell and log files
+
+# License
+
+MIT © [Matt Alexander](https://github.com/mattalexx)
