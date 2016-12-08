@@ -26,6 +26,10 @@ Run run.sh with a start and end date, like this:
 
     ./run.sh 2015-09-29 2015-09-30
 
+This will use `config.properties` by default. You can also do the following:
+
+    PROP_FILE=config.some_client.properties ./run.sh 2015-09-29 2015-09-30
+
 Running the above command will output something that looks like this:
 
     ==== BASH SCRIPT START ============================
@@ -45,12 +49,10 @@ Press any key to submit the time to Jira. *todo: use a (Y/n) instead, it's safer
 
 You will then see something that looks like this:
 
-    SXC-487 2016-12-07T00:01:00.000-0600 2.25h;
-    {"self":"https://some_client.atlassian.net/rest/api/2/issue/19794/worklog/13715","author":{"self":"https://some_client.atlassian.net/rest/api/2/user?username=your_username","name":"your_username","key":"your_username","emailAddress":"you@your_email.com","avatarUrls":{"48x48":"https://some_client.atlassian.net/secure/useravatar?ownerId=your_username&avatarId=xxxxx","24x24":"https://some_client.atlassian.net/secure/useravatar?size=small&ownerId=your_username&avatarId=xxxxx","16x16":"https://some_client.atlassian.net/secure/useravatar?size=xsmall&ownerId=your_username&avatarId=xxxxx","32x32":"https://some_client.atlassian.net/secure/useravatar?size=medium&ownerId=your_username&avatarId=xxxxx"},"displayName":"Your actual Name","active":true,"timeZone":"America/Montreal"},"updateAuthor":{"self":"https://some_client.atlassian.net/rest/api/2/user?username=your_username","name":"your_username","key":"your_username","emailAddress":"you@your_email.com","avatarUrls":{"48x48":"https://some_client.atlassian.net/secure/useravatar?ownerId=your_username&avatarId=xxxxx","24x24":"https://some_client.atlassian.net/secure/useravatar?size=small&ownerId=your_username&avatarId=xxxxx","16x16":"https://some_client.atlassian.net/secure/useravatar?size=xsmall&ownerId=your_username&avatarId=xxxxx","32x32":"https://some_client.atlassian.net/secure/useravatar?size=medium&ownerId=your_username&avatarId=xxxxx"},"displayName":"Your actual Name","active":true,"timeZone":"A
-    merica/Montreal"},"created":"2016-12-08T14:29:30.204+0000","updated":"2016-12-08T14:29:30.204+0000","started":"2016-12-07T06:01:00.00
-    0+0000","timeSpent":"2h 15m","timeSpentSeconds":8100,"id":"13715","issueId":"19794"}
+    KEY-456 2016-12-07T00:01:00.000-0600 2.25h;
+    {"self":"https://some_client.atlassian.net/rest/api/2/issue/19794/worklog/13715","author":{"self":"https://some_client.atlassian.net/rest/api/2/user?username=your_username","name":"your_username","key":"your_username","emailAddress":"you@your_email.com","avatarUrls":{"48x48":"https://some_client.atlassian.net/secure/useravatar?ownerId=your_username&avatarId=xxxxx","24x24":"https://some_client.atlassian.net/secure/useravatar?size=small&ownerId=your_username&avatarId=xxxxx","16x16":"https://some_client.atlassian.net/secure/useravatar?size=xsmall&ownerId=your_username&avatarId=xxxxx","32x32":"https://some_client.atlassian.net/secure/useravatar?size=medium&ownerId=your_username&avatarId=xxxxx"},"displayName":"Your actual Name","active":true,"timeZone":"America/Montreal"},"updateAuthor":{"self":"https://some_client.atlassian.net/rest/api/2/user?username=your_username","name":"your_username","key":"your_username","emailAddress":"you@your_email.com","avatarUrls":{"48x48":"https://some_client.atlassian.net/secure/useravatar?ownerId=your_username&avatarId=xxxxx","24x24":"https://some_client.atlassian.net/secure/useravatar?size=small&ownerId=your_username&avatarId=xxxxx","16x16":"https://some_client.atlassian.net/secure/useravatar?size=xsmall&ownerId=your_username&avatarId=xxxxx","32x32":"https://some_client.atlassian.net/secure/useravatar?size=medium&ownerId=your_username&avatarId=xxxxx"},"displayName":"Your actual Name","active":true,"timeZone":"America/Montreal"},"created":"2016-12-08T14:29:30.204+0000","updated":"2016-12-08T14:29:30.204+0000","started":"2016-12-07T06:01:00.000+0000","timeSpent":"2h 15m","timeSpentSeconds":8100,"id":"13715","issueId":"19794"}
 
-    WEG-4 2016-12-07T00:01:00.000-0600 0.50h;
+    KEY-123 2016-12-07T00:01:00.000-0600 0.50h;
     {"errorMessages":["Issue Does Not Exist"],"errors":{}}
 
     [and on and on...]
@@ -58,7 +60,7 @@ You will then see something that looks like this:
 ## Notes
 
 Output has changed a little, I prefer per line output instead of a big wall of json text on one line.
-keeping log files with parameters and current time whic is quite handy if something went wrong.
+keeping log files with parameters and current time which is quite handy if something went wrong.
 
 ### TODO
 
