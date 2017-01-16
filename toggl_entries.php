@@ -76,7 +76,7 @@ class TogglCaller {
         }
 
         // Build array of data
-        $days = array();
+        $starts = array();
         foreach ($entries as $entry) {
 
             // Description should be in Jira ticket ID format: "MYPROJ-123"
@@ -89,19 +89,21 @@ class TogglCaller {
                 continue;
             }
 
-            $day = date('Y-m-d', strtotime($entry->start));
+            // From https://github.com/toggl/toggl_api_docs
+            // Times and dates use the ISO 8601 standard, more specifically a subset described in RFC 3339.
+            $start = date(DATE_RFC3339, strtotime($entry->start));
             $ticket = $matches[1];
 
-            if (!isset($days[$day][$ticket])) {
-                $days[$day][$ticket] = 0;
+            if (!isset($starts[$start][$ticket])) {
+                $starts[$start][$ticket] = 0;
             }
 
-            $days[$day][$ticket] += $entry->duration;
+            $starts[$start][$ticket] += $entry->duration;
         }
 
         // Aggregate data
         $rows = array();
-        foreach ($days as $day => $tickets) {
+        foreach ($starts as $start => $tickets) {
             foreach ($tickets as $ticket => $seconds) {
                 $minutes = $seconds / 60;
                 $hours = $minutes / 60;
@@ -113,18 +115,18 @@ class TogglCaller {
 
                 $spent = sprintf('%.2fh', $hours);
 
-                $rows[] = compact('ticket', 'day', 'spent');
+                $rows[] = compact('ticket', 'start', 'spent');
             }
         }
 
         // Sort data
         $tickets = array();
-        $days = array();
+        $starts = array();
         foreach ($rows as $key => $row) {
             $tickets[$key]  = $row['ticket'];
-            $days[$key] = $row['day'];
+            $starts[$key] = $row['start'];
         }
-        array_multisort($tickets, SORT_ASC, $days, SORT_ASC, $rows);
+        array_multisort($tickets, SORT_ASC, $starts, SORT_ASC, $rows);
 
         // Script
         $url = $JIRA_URL . '/rest/api/2';
@@ -134,8 +136,14 @@ class TogglCaller {
 
 <?php
 $entry = new StdClass();
-// todo: use real started hour from toggl
-$entry->started = date('Y-m-d\TH:i:s.000O', strtotime($row['day'].' 12:01 AM'));
+
+// Jira uses a custom format similar to ISO 8601 RFC 3339
+// https://answers.atlassian.com/questions/180275/update-jira-rest-api-datetime-value
+$jira_format = 'Y-m-d\TH:i:s.000O';
+$start_datetime = new DateTime($row['start']);
+$jira_datetime = $start_datetime->format($jira_format);
+
+$entry->started = $jira_datetime;
 $entry->timeSpent = $row['spent'];
 $entry->author = new StdClass;
 $entry->author->self = $url . '/user?username=' . $JIRA_USER;
