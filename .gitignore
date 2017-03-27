@@ -5,3 +5,4 @@
 /config.*.properties
 /insert_entries/*
 !/insert_entries/.gitkeep
+docker_data/
