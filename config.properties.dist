@@ -1,8 +1,0 @@
-TOGGL_USER=matt@example.com
-TOGGL_WORKSPACE_ID=12345
-TOGGL_KEY_FILE=/Users/your_user/.toggl-key
-JIRA_URL=https://myjira.atlassian.net
-JIRA_USER=your_username
-JIRA_PASSWORD_FILE=/Users/your_user/.jira-pass
-TIMEZONE=America/Chicago
-CLIENT_NAME=some_client
