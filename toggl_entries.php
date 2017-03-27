@@ -1,11 +1,13 @@
 <?php
+
 /**
  * Output CSV-formatted output from Toggl that can be entered into Jira
  */
+class TogglCaller
+{
 
-class TogglCaller {
-
-    public static function getPropertyValues() {
+    public static function getPropertyValues()
+    {
         $configurationFile = getenv('PROP_FILE');
         $result = array();
         $lines = file($configurationFile);
@@ -38,11 +40,12 @@ class TogglCaller {
         return $result;
     }
 
-   /**
-    * TODO: Make this method longer
-    *
-    */
-    public static function call($in) {
+    /**
+     * TODO: Make this method longer
+     *
+     */
+    public static function call($in)
+    {
         $configuration = self::getPropertyValues();
         extract($configuration);
 
@@ -123,7 +126,7 @@ class TogglCaller {
         $tickets = array();
         $starts = array();
         foreach ($rows as $key => $row) {
-            $tickets[$key]  = $row['ticket'];
+            $tickets[$key] = $row['ticket'];
             $starts[$key] = $row['start'];
         }
         array_multisort($tickets, SORT_ASC, $starts, SORT_ASC, $rows);
@@ -131,31 +134,31 @@ class TogglCaller {
         // Script
         $url = $JIRA_URL . '/rest/api/2';
         ob_start();
-?>#!/bin/bash
-<?php foreach ($rows as $row): ?>
+        ?>#!/bin/bash
+        <?php foreach ($rows as $row): ?>
 
-<?php
-$entry = new StdClass();
+        <?php
+        $entry = new StdClass();
 
 // Jira uses a custom format similar to ISO 8601 RFC 3339
 // https://answers.atlassian.com/questions/180275/update-jira-rest-api-datetime-value
-$jira_format = 'Y-m-d\TH:i:s.000O';
-$start_datetime = new DateTime($row['start']);
-$jira_datetime = $start_datetime->format($jira_format);
+        $jira_format = 'Y-m-d\TH:i:s.000O';
+        $start_datetime = new DateTime($row['start']);
+        $jira_datetime = $start_datetime->format($jira_format);
 
-$entry->started = $jira_datetime;
-$entry->timeSpent = $row['spent'];
-$entry->author = new StdClass;
-$entry->author->self = $url . '/user?username=' . $JIRA_USER;
-?>
-echo '<?php echo "{$row['ticket']} {$entry->started} $entry->timeSpent;"; ?>'
-curl -u <?php echo $JIRA_USER ?>:$(cat <?php echo $JIRA_PASSWORD_FILE ?>) -X POST -H "Content-Type: application/json" \
---data '<?php echo json_encode($entry); ?>' \
-<?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog
-echo ""
-echo ""
-<?php endforeach; ?>
-<?php
+        $entry->started = $jira_datetime;
+        $entry->timeSpent = $row['spent'];
+        $entry->author = new StdClass;
+        $entry->author->self = $url . '/user?username=' . $JIRA_USER;
+        ?>
+        echo '<?php echo "{$row['ticket']} {$entry->started} $entry->timeSpent;"; ?>'
+        curl -u <?php echo $JIRA_USER ?>:$(cat <?php echo $JIRA_PASSWORD_FILE ?>) -X POST -H "Content-Type: application/json" \
+        --data '<?php echo json_encode($entry); ?>' \
+        <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog
+        echo ""
+        echo ""
+    <?php endforeach; ?>
+        <?php
         return ob_get_clean() . "\n";
     }
 }
