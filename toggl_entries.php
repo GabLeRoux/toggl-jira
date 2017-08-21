@@ -44,35 +44,37 @@ class TogglCaller
      * TODO: Make this method longer
      *
      */
-    public static function call($in)
+    public static function call($configuration_file)
     {
-        $configuration = self::getPropertyValues();
-        extract($configuration);
+        $config = self::getPropertyValues();
 
-        if (empty($in)) {
+        if (empty($configuration_file)) {
             throw new InvalidArgumentException("Invalid argument value");
         }
-
-        if (empty($JIRA_URL)) {
+        if (!isset($config['JIRA_URL']) || empty($config['JIRA_URL'])) {
             throw new RuntimeException("Missing config \"JIRA_URL\"");
         }
-        if (empty($JIRA_USER)) {
+        if (!isset($config['JIRA_USER']) || empty($config['JIRA_USER'])) {
             throw new RuntimeException("Missing config \"JIRA_USER\"");
         }
-        if (empty($JIRA_PASSWORD_FILE)) {
+        if (!isset($config['JIRA_PASSWORD_FILE']) || empty($config['JIRA_PASSWORD_FILE'])) {
             throw new RuntimeException("Missing config \"JIRA_PASSWORD_FILE\"");
         }
-        if (empty($TIMEZONE)) {
+        if (!isset($config['TIMEZONE']) || empty($config['TIMEZONE'])) {
             throw new RuntimeException("Missing config \"TIMEZONE\"");
         }
 
-        date_default_timezone_set($TIMEZONE);
+        if (!isset($config['COMMENT_SEPARATOR']) || empty($config['COMMENT_SEPARATOR'])) {
+            $config['COMMENT_SEPARATOR'] = ' || ';
+        }
+
+        date_default_timezone_set($config['TIMEZONE']);
 
         // Get time entries from JSON
-        $entries = json_decode($in);
+        $entries = json_decode($configuration_file);
 
         if (!is_array($entries)) {
-            throw new RuntimeException(sprintf('Toggl server returned error: "%s"', trim($in)));
+            throw new RuntimeException(sprintf('Toggl server returned error: "%s"', trim($configuration_file)));
         }
         if (count($entries) === 0) {
             throw new RuntimeException('No entries in that time period');
@@ -81,10 +83,11 @@ class TogglCaller
         // Build array of data
         $starts = array();
         $projects = array();
+        $comments = array();
 
         // Build projects array
-        if (!empty($configuration['PROJECTS'])) {
-            $projects = explode(',', $configuration['PROJECTS']);
+        if (!empty($config['PROJECTS'])) {
+            $projects = explode(',', $config['PROJECTS']);
         }
 
         foreach ($entries as $entry) {
@@ -114,17 +117,26 @@ class TogglCaller
             $ticket = $matches[1];
 
             if (!isset($starts[$start][$ticket])) {
-                $starts[$start][$ticket] = 0;
+                $starts[$start][$ticket]['duration'] = 0;
             }
 
-            $starts[$start][$ticket] += $entry->duration;
+            $starts[$start][$ticket]['duration'] += $entry->duration;
+
+            // extract jira comment (inserted in entry log)
+            // todo: make this beautiful, this is really ugly...
+            $e_comment = explode($config['COMMENT_SEPARATOR'], $entry->description);
+            if (isset($e_comment[1]) && !empty($e_comment[1])) {
+                $e_comment = $e_comment[1];
+                $starts[$start][$ticket]['comment'] = $e_comment;
+            }
+
         }
 
         // Aggregate data
         $rows = array();
         foreach ($starts as $start => $tickets) {
-            foreach ($tickets as $ticket => $seconds) {
-                $minutes = $seconds / 60;
+            foreach ($tickets as $ticket => $data) {
+                $minutes = $data['duration'] / 60;
                 $hours = $minutes / 60;
 
                 // Skip tasks less than 5 minutes
@@ -133,8 +145,11 @@ class TogglCaller
                 }
 
                 $spent = sprintf('%.2fh', $hours);
+                $comment = $data['comment'];
 
-                $rows[] = compact('ticket', 'start', 'spent');
+                // todo: improve this, looks like side effect
+                $rows[] = compact('ticket', 'start', 'spent', 'comment');
+                $comment = null;
             }
         }
 
@@ -148,7 +163,7 @@ class TogglCaller
         array_multisort($tickets, SORT_ASC, $starts, SORT_ASC, $rows);
 
         // Script
-        $url = $JIRA_URL . '/rest/api/2';
+        $url = $config['JIRA_URL'] . '/rest/api/2';
         ob_start();
         ?>#!/bin/bash
         <?php foreach ($rows as $row): ?>
@@ -165,10 +180,16 @@ class TogglCaller
         $entry->started = $jira_datetime;
         $entry->timeSpent = $row['spent'];
         $entry->author = new StdClass;
-        $entry->author->self = $url . '/user?username=' . $JIRA_USER;
+        $entry->author->self = $url . '/user?username=' . $config['JIRA_USER'];
+
+        if (isset($row['comment']) && !empty($row['comment'])) {
+            $entry->comment = $row['comment'];
+            var_dump($row['comment']);
+        }
+
         ?>
         echo '<?php echo "{$row['ticket']} {$entry->started} $entry->timeSpent;"; ?>'
-        curl -u <?php echo $JIRA_USER ?>:$(cat <?php echo $JIRA_PASSWORD_FILE ?>) -X POST -H "Content-Type: application/json" \
+        curl -u <?php echo $config['JIRA_USER'] ?>:$(cat <?php echo $config['JIRA_PASSWORD_FILE'] ?>) -X POST -H "Content-Type: application/json" \
         --data '<?php echo json_encode($entry); ?>' \
         <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog
         echo ""
