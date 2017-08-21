@@ -6,3 +6,4 @@ JIRA_USER=your_username
 JIRA_PASSWORD_FILE=/Users/your_user/.jira-pass
 TIMEZONE=America/Chicago
 CLIENT_NAME=some_client
+PROJECT=EXPRJ,JIRAPRJ,OTHERPRJ,SUP,ISSUE

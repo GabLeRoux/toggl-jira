@@ -80,6 +80,13 @@ class TogglCaller
 
         // Build array of data
         $starts = array();
+        $projects = array();
+
+        // Build projects array
+        if (!empty($configuration['PROJECTS'])) {
+            $projects = explode(',', $configuration['PROJECTS']);
+        }
+
         foreach ($entries as $entry) {
 
             // Description should be in Jira ticket ID format: "MYPROJ-123"
@@ -90,6 +97,15 @@ class TogglCaller
             // Currently running durations are negative
             if ($entry->duration <= 0) {
                 continue;
+            }
+
+            // extract project id from description:
+            if (!empty($projects)) {
+                preg_match('/^([A-Z0-9]+)\b/', $entry->description, $project);
+                $project = $project[0];
+                if (!in_array($project, $projects)) {
+                    continue;
+                }
             }
 
             // From https://github.com/toggl/toggl_api_docs
