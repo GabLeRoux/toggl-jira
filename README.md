@@ -4,6 +4,14 @@
 
 Download time entries from Toggl and use them to log time in Jira
 
+## Features
+
+* multiple configurations for multiple jira
+* White list project keys for api calls (`PROJECTS` in config file comma separated)
+* Pass the right starting time from Toggl time entry to jira
+* Displays executed commands prior to running them
+* Hides password from the command line
+
 ## Setup
 
 1. Run:
@@ -30,7 +38,7 @@ This will use `config.properties` by default. You can also do the following:
 
     PROP_FILE=config.some_client.properties ./run.sh 2015-09-29 2015-09-30
 
-Running the above command will output something that looks like this:
+*Running the above command will output something that looks like this:
 
     ==== BASH SCRIPT START ============================
     #!/bin/bash
@@ -64,8 +72,6 @@ keeping log files with parameters and current time which is quite handy if somet
 
 ### TODO
 
-* Pass an optional list of issue keys in config or parameter
-* **Actually set the right hour in jira, that would be very useful.**
 * Maybe rewrite most of the things here into something a bit more cleaner? Thinking of typescript, making a node module or something like that.
 * Add client name to generated shell and log files
 
