@@ -44,11 +44,11 @@ class TogglCaller
      * TODO: Make this method longer
      *
      */
-    public static function call($configuration_file)
+    public static function call($json_input)
     {
         $config = self::getPropertyValues();
 
-        if (empty($configuration_file)) {
+        if (empty($json_input)) {
             throw new InvalidArgumentException("Invalid argument value");
         }
         if (!isset($config['JIRA_URL']) || empty($config['JIRA_URL'])) {
@@ -71,10 +71,10 @@ class TogglCaller
         date_default_timezone_set($config['TIMEZONE']);
 
         // Get time entries from JSON
-        $entries = json_decode($configuration_file);
+        $entries = json_decode($json_input);
 
         if (!is_array($entries)) {
-            throw new RuntimeException(sprintf('Toggl server returned error: "%s"', trim($configuration_file)));
+            throw new RuntimeException(sprintf('Toggl server returned error: "%s"', trim($json_input)));
         }
         if (count($entries) === 0) {
             throw new RuntimeException('No entries in that time period');
@@ -83,7 +83,6 @@ class TogglCaller
         // Build array of data
         $starts = array();
         $projects = array();
-        $comments = array();
 
         // Build projects array
         if (!empty($config['PROJECTS'])) {
@@ -125,11 +124,12 @@ class TogglCaller
             // extract jira comment (inserted in entry log)
             // todo: make this beautiful, this is really ugly...
             $e_comment = explode($config['COMMENT_SEPARATOR'], $entry->description);
+            // ' breaks shell script, we'll handle this in the python rewrite ;)
+            $e_comment = str_replace("'", ' ', $e_comment);
             if (isset($e_comment[1]) && !empty($e_comment[1])) {
                 $e_comment = $e_comment[1];
                 $starts[$start][$ticket]['comment'] = $e_comment;
             }
-
         }
 
         // Aggregate data
@@ -145,10 +145,14 @@ class TogglCaller
                 }
 
                 $spent = sprintf('%.2fh', $hours);
-                $comment = $data['comment'];
+                // todo: improve this, it's really crappy
+                if (isset($data['comment']) && !empty($data['comment'])) {
+                    $comment = $data['comment'];
 
-                // todo: improve this, looks like side effect
-                $rows[] = compact('ticket', 'start', 'spent', 'comment');
+                    $rows[] = compact('ticket', 'start', 'spent', 'comment');
+                } else {
+                    $rows[] = compact('ticket', 'start', 'spent');
+                }
                 $comment = null;
             }
         }
@@ -184,7 +188,6 @@ class TogglCaller
 
         if (isset($row['comment']) && !empty($row['comment'])) {
             $entry->comment = $row['comment'];
-            var_dump($row['comment']);
         }
 
         ?>
@@ -202,14 +205,14 @@ class TogglCaller
 
 // Get JSON from stdin
 $fd = fopen('php://stdin', 'r');
-$in = '';
+$json_input = '';
 while (!feof($fd)) {
-    $in .= fread($fd, 1024);
+    $json_input .= fread($fd, 1024);
 }
 fclose($fd);
 
 try {
-    $out = TogglCaller::call($in);
+    $out = TogglCaller::call($json_input);
 
     // Write string to stdout
     $fd = fopen('php://stdout', 'w');
