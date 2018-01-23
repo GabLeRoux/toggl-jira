@@ -91,6 +91,10 @@ class TogglCaller
 
         foreach ($entries as $entry) {
 
+            if (empty($entry->description)) {
+                continue;
+            }
+
             // Description should be in Jira ticket ID format: "MYPROJ-123"
             if (preg_match('/^([A-Z0-9]+-\d+)\b/', $entry->description, $matches) === 0) {
                 continue;
