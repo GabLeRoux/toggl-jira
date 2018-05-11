@@ -1,5 +1,7 @@
 # toggl-jira
 
+[![Build Status](https://travis-ci.com/GabLeRoux/toggl-jira.svg?branch=master)](https://travis-ci.com/GabLeRoux/toggl-jira)
+
 :clock10: Download time entries from Toggl and use them to log time in Jira
 
 # ⚠ This is still a Work in Progress
