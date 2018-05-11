@@ -45,6 +45,9 @@ def validate_date(date_text):
 @click.version_option('1.0')
 @click.pass_context
 def cli(ctx, start_date, end_date):
+    validate_date(start_date)
+    validate_date(end_date)
+
     print('from: %s' % start_date)
     print('to: %s' % end_date)
 
