@@ -1,5 +1,9 @@
 import requests
 
+# TODO: have a look to these:
+# https://github.com/matthewdowney/TogglPy
+# https://github.com/GabLeRoux/toggl-cli
+
 
 class TogglClientApi:
     defaultCredentials = {

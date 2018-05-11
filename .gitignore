@@ -103,3 +103,4 @@ celerybeat-schedule
 
 # Rope project settings
 .ropeproject
+config.*.properties
