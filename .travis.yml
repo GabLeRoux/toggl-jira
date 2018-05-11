@@ -12,7 +12,7 @@ install:
 
 script:
   - tox
-  - coverage run py.test
+  - py.test --cov=myproj tests/
   - coverage report -m
 
 after_success:
