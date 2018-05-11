@@ -1,13 +1,11 @@
-appdirs==1.4.3
 attrs==18.1.0
 click==6.7
 coverage==4.5.1
 more-itertools==4.1.0
-packaging==16.8
 pluggy==0.6.0
 py==1.5.3
-pyparsing==2.2.0
 pytest==3.5.1
+pytest-cov==2.5.1
 python-toggl==0.1.4
 requests==2.13.0
 six==1.10.0
