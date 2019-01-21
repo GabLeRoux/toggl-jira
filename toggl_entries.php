@@ -57,9 +57,6 @@ class TogglCaller
         if (!isset($config['JIRA_USER']) || empty($config['JIRA_USER'])) {
             throw new RuntimeException("Missing config \"JIRA_USER\"");
         }
-        if (!isset($config['JIRA_PASSWORD_FILE']) || empty($config['JIRA_PASSWORD_FILE'])) {
-            throw new RuntimeException("Missing config \"JIRA_PASSWORD_FILE\"");
-        }
         if (!isset($config['TIMEZONE']) || empty($config['TIMEZONE'])) {
             throw new RuntimeException("Missing config \"TIMEZONE\"");
         }
@@ -196,7 +193,7 @@ class TogglCaller
 
         ?>
         echo '<?php echo "{$row['ticket']} {$entry->started} $entry->timeSpent;"; ?>'
-        curl -u <?php echo $config['JIRA_USER'] ?>:$(cat <?php echo $config['JIRA_PASSWORD_FILE'] ?>) -X POST -H "Content-Type: application/json" \
+        curl -u <?php echo $config['JIRA_USER'] ?>:'<?php echo $_ENV['JIRA_PASSWORD'] ?>' -X POST -H "Content-Type: application/json" \
         --data '<?php echo json_encode($entry); ?>' \
         <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog
         echo ""

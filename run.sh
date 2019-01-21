@@ -1,24 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
+#set -x
 
 START_DATE="$1"
 END_DATE="$2"
 
-# use configuration PROP_FILE from environment variable or use default
-if [[ -z "${PROP_FILE}" ]]; then
-  PROP_FILE="config.properties"
-else
-  PROP_FILE="${PROP_FILE}"
-fi
-
-# output files to FILES_DESTINATION environment variable or use default
-if [[ -z "${FILES_DESTINATION}" ]]; then
-  FILES_DESTINATION="./insert_entries"
-else
-  FILES_DESTINATION="${FILES_DESTINATION}"
-fi
-
+PROP_FILE=config/${PROP_FILE:-"config.properties"}
+FILES_DESTINATION=${FILES_DESTINATION:-"./insert_entries"}
 
 function get_property
 {
@@ -26,7 +15,7 @@ function get_property
     PROP_VALUE=`cat $PROP_FILE | grep "$PROP_KEY" | cut -d'=' -f2`
     PROP_VALUE=${PROP_VALUE//[[:blank:]]/}
 
-    if [ ! "$PROP_VALUE" ]; then
+    if [[ ! "$PROP_VALUE" ]]; then
         echo "Configuration option $PROP_KEY is required"
         exit 1
     fi
@@ -36,10 +25,9 @@ function get_property
 
 TOGGL_USER=$(get_property "TOGGL_USER")
 TOGGL_WORKSPACE_ID=$(get_property "TOGGL_WORKSPACE_ID")
-TOGGL_KEY_FILE=$(get_property "TOGGL_KEY_FILE")
 CLIENT_NAME=$(get_property "CLIENT_NAME") # only used for generated files names
 
-KEY=$(head -n 1 "$TOGGL_KEY_FILE");
+KEY=${TOGGL_KEY}
 
 DATE_REGEX="[0-9]{4}-[0-9]{2}-[0-9]{2}"
 [[ $START_DATE =~ $DATE_REGEX && $END_DATE =~ $DATE_REGEX ]] || {
@@ -76,7 +64,7 @@ echo "Script saved to ${FILES_DESTINATION}/${script_name}"
 echo "$code" > "${FILES_DESTINATION}/${script_name}"
 
 # Prompt user
-echo "Press any key to submit the time to Jira (or Crtl+C to exit) ..."
+echo "Press any key to submit the time to Jira (Crtl+C or Ctrl+D to exit) ..."
 read -n 1
 
 # Submit to Jira

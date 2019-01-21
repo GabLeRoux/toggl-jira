@@ -2,7 +2,9 @@
 .DS_Store
 /config.properties
 /.idea
-/config.*.properties
+/config/*.properties
+/config/.env*
 /insert_entries/*
 !/insert_entries/.gitkeep
 docker_data/
+docker-compose.*.yml
