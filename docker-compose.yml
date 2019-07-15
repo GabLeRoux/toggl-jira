@@ -1,7 +1,9 @@
 version: '2'
 services:
   php:
-    image: php:7.3.1-cli-stretch
+    build:
+      context: .
+      dockerfile: compose/php/Dockerfile
     ports:
       - "80:80"
     volumes:

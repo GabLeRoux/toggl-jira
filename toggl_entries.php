@@ -195,7 +195,8 @@ class TogglCaller
         echo '<?php echo "{$row['ticket']} {$entry->started} $entry->timeSpent;"; ?>'
         curl -u <?php echo $config['JIRA_USER'] ?>:'<?php echo $_ENV['JIRA_PASSWORD'] ?>' -X POST -H "Content-Type: application/json" \
         --data '<?php echo json_encode($entry); ?>' \
-        <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog
+        <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog \
+        | jq '{"timeSpent": .timeSpent, "id": .id, "issueId": .issueId, "worklog_url": .self}'
         echo ""
         echo ""
     <?php endforeach; ?>
