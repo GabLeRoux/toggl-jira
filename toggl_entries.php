@@ -176,10 +176,15 @@ class TogglCaller
         <?php
         $entry = new StdClass();
 
-// Jira uses a custom format similar to ISO 8601 RFC 3339
-// https://answers.atlassian.com/questions/180275/update-jira-rest-api-datetime-value
+        // Jira uses a custom format similar to ISO 8601 RFC 3339
+        // https://answers.atlassian.com/questions/180275/update-jira-rest-api-datetime-value
         $jira_format = 'Y-m-d\TH:i:s.000O';
-        $start_datetime = new DateTime($row['start']);
+        try {
+            $start_datetime = new DateTime($row['start']);
+        } catch (Exception $e) {
+            echo "Couldn't create new DateTime from " . $row['start'];
+            die(1);
+        }
         $jira_datetime = $start_datetime->format($jira_format);
 
         $entry->started = $jira_datetime;
@@ -192,10 +197,12 @@ class TogglCaller
         }
 
         ?>
-        echo '<?php echo "{$row['ticket']} {$entry->started} $entry->timeSpent;"; ?>'
+        echo '<?php echo "{$row['ticket']} $entry->started $entry->timeSpent;"; ?>'
         curl -u <?php echo $config['JIRA_USER'] ?>:'<?php echo $_ENV['JIRA_PASSWORD'] ?>' -X POST -H "Content-Type: application/json" \
         --data '<?php echo json_encode($entry); ?>' \
-        <?php echo $url; ?>/issue/<?php echo $row['ticket']; ?>/worklog \
+        <?php
+        $worklogUrl = $url . '/issue/' . $row['ticket'] . '/worklog';
+        echo $worklogUrl ?> \
         | jq '{"timeSpent": .timeSpent, "id": .id, "issueId": .issueId, "worklog_url": .self}'
         echo ""
         echo ""
@@ -205,20 +212,24 @@ class TogglCaller
     }
 }
 
-// Get JSON from stdin
-$fd = fopen('php://stdin', 'r');
-$json_input = '';
-while (!feof($fd)) {
-    $json_input .= fread($fd, 1024);
-}
-fclose($fd);
+function getJSONFromStdin()
+{
+    $fd = fopen('php://stdin', 'r');
+    $json_input = '';
+    while (!feof($fd)) {
+        $json_input .= fread($fd, 1024);
+    }
+    fclose($fd);
 
-try {
-    $out = TogglCaller::call($json_input);
+    try {
+        $out = TogglCaller::call($json_input);
 
-    // Write string to stdout
-    $fd = fopen('php://stdout', 'w');
-    fwrite($fd, $out);
-} catch (Exception $e) {
-    print $e->getMessage();
+        // Write string to stdout
+        $fd = fopen('php://stdout', 'w');
+        fwrite($fd, $out);
+    } catch (Exception $e) {
+        print $e->getMessage();
+    }
 }
+
+getJSONFromStdin();

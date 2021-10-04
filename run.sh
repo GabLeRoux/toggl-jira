@@ -44,7 +44,7 @@ DAY_AFTER_END_DATE="${END_DATE:0:8}${DAY}"
 TIME="T00%3A01%3A00-05%3A00" # T00:01:00-05:00 (12:01 AM Eastern)
 
 script_name="${CLIENT_NAME}_${START_DATE}_${END_DATE}_`date +%Y-%m-%d_%Hh%Mm`.sh"
-toggl_url="https://www.toggl.com/api/v8/time_entries"
+toggl_url="https://api.track.toggl.com/api/v8/time_entries"
 toggl_url+="?user_agent=${TOGGL_USER}"
 toggl_url+="&workspace_id=${TOGGL_WORKSPACE_ID}"
 toggl_url+="&start_date=${START_DATE}${TIME}"
