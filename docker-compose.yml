@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: compose/php/Dockerfile
-    ports:
-      - "80:80"
     volumes:
       - "./:/app/"
     command: /app/run.sh
