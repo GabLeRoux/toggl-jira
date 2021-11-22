@@ -8,3 +8,4 @@
 !/insert_entries/.gitkeep
 docker_data/
 docker-compose.*.yml
+scripts
